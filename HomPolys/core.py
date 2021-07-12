@@ -44,8 +44,11 @@ class Monomial:
         result = ""
         for i in range(self.num_var):
             if self._powers[i] != 0:
-                result += "x_{i}^{j}".format(i=i, j="{%d}" % self._powers[i])
+                result += "x_{i}^{j}".format(i="{%d}" % i, j="{%d}" % self._powers[i])
         return result
+
+    def __eq__(self, other):
+        return self._powers == other.get_powers()
 
     def __str__(self):
         return helpers.tex(self._tex())
@@ -96,6 +99,15 @@ class Polynomial:
         self._clear_monomials()
         for i in tqdm(range(len(self._coef))):
             self._monomials += Monomial(self.num_var, self._powers[i])
+
+    def get_monomials(self):
+        return self._monomials
+
+    def get_monomial(self, ind):
+        return self._monomials[ind]
+
+    def number_terms(self):
+        return len(self._monomials)
 
     # Add monomials to polynomial
 
@@ -154,6 +166,7 @@ class Polynomial:
             *graphs.create_graph_edges(string),
             coef=coef
         )
+        return self
 
     # Polynomial manipulation techniques using methods
 
@@ -175,6 +188,17 @@ class Polynomial:
             other.get_powers())
 
     
+    # Equality and inequality
+
+    def __eq__(self, other):
+        if (self.num_var == other.num_var
+                and self.number_terms() == other.number_terms()
+                and self.get_monomials() == other.get_monomials()
+                and self.get_coefs() == other.get_coefs()):
+            return True
+        return False
+
+    
     # Format output
     def _tex(self):
         result = ""
@@ -187,6 +211,9 @@ class Polynomial:
         return result
 
     def __str__(self):
+        return self._tex()
+    
+    def tex(self):
         return helpers.tex(self._tex())
 
 

@@ -1,4 +1,4 @@
-# Hom_Polys
+# HomPolys
 
 
 ## Installation Instructions
