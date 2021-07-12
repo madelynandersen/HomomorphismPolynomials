@@ -4,10 +4,13 @@ Author: Madelyn Andersen
 Core file for polynomials.
 """
 
+import os
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
+
 import helpers
 import graphs
 
-import sys
 import itertools
 from tqdm import tqdm
 import multiprocess as mp

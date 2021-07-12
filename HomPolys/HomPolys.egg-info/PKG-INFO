@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: HomPolys
+Version: 0.0.1
+Summary: A package to compute polynomial representation of homomorphism numbers for graphs
+Home-page: https://github.com/madelynandersen/HomomorphismPolynomials
+Author: Madelyn Andersen
+Author-email: mandersen@hmc.edu
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/madelynandersen/HomomorphismPolynomials/issues
+Description: # Hom_Polys
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

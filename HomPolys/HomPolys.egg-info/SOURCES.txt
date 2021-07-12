@@ -1,0 +1,6 @@
+README.rst
+setup.py
+HomPolys/HomPolys.egg-info/PKG-INFO
+HomPolys/HomPolys.egg-info/SOURCES.txt
+HomPolys/HomPolys.egg-info/dependency_links.txt
+HomPolys/HomPolys.egg-info/top_level.txt
