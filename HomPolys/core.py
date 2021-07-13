@@ -98,7 +98,7 @@ class Polynomial:
     def set_monomials(self):
         self._clear_monomials()
         for i in tqdm(range(len(self._coef))):
-            self._monomials += Monomial(self.num_var, self._powers[i])
+            self._monomials += [Monomial(self.num_var, self._powers[i])]
 
     def get_monomials(self):
         return self._monomials

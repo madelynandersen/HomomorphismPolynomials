@@ -32,6 +32,9 @@ def create_graph_edges(string):
         return edge_list
     
     num_vertices = int(string[len(graph_type):])
+
+    if num_vertices == 0:
+        return (0, [])
     
     if graph_type == "K":
         if num_vertices == 0: edge_list = []
