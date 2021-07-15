@@ -42,7 +42,7 @@ class Monomial:
     def _tex(self):
         """ Returns a tex-friendly formatting of the monomial."""
         result = ""
-        for i in range(self.num_var):
+        for i in range(self.num_var ** 2):
             if self._powers[i] != 0:
                 result += "x_{i}^{j}".format(i="{%d}" % i, j="{%d}" % self._powers[i])
         return result
@@ -50,13 +50,25 @@ class Monomial:
     def __eq__(self, other):
         return self._powers == other.get_powers()
 
+    def __mul__(self, other):
+        assert isinstance(other, Monomial), 'must be monomial to multiply'
+        assert other.num_var == self.num_var, 'undefined op for different num_var'
+        new = Monomial(self.num_var)
+        new.set_powers((
+            np.array(self.get_powers()) + np.array(other.get_powers())
+            ).tolist())
+        return new
+
+    
+    __rmul__ = __mul__ # commutative
+
     def __str__(self):
         return helpers.tex(self._tex())
 
 class Polynomial:
     """ Represent a polynomial as a class."""
 
-    def __init__(self, num_var, coef=None, powers=None):
+    def __init__(self, num_var, coef=None, powers=None, string=None):
         self.num_var = num_var
         self._monomials = []
         self._coef = []
@@ -66,19 +78,24 @@ class Polynomial:
         if powers:
             self._powers = powers
             self.set_monomials()
+        if string:
+            self.add_monomial_from_graph_string(string)
 
     # Get and set attributes
     def _clear(self):
         self._coef = []
         self._powers = []
         self._monomials = []
+        return self
 
     def _clear_monomials(self):
         self._monomials = []
+        return self
         
     def set_powers(self, powers):
         self._powers = powers
         self.set_monomials()
+        return self
     
     def get_powers(self):
         return self._powers
@@ -88,6 +105,11 @@ class Polynomial:
     
     def set_coef(self, coef):
         self._coef = coef
+        return self
+
+    def scale_coefs(self, scalar):
+        self._coef = (np.array(self._coef) * scalar).tolist()
+        return self
     
     def get_coefs(self):
         return self._coef
@@ -99,6 +121,7 @@ class Polynomial:
         self._clear_monomials()
         for i in tqdm(range(len(self._coef))):
             self._monomials += [Monomial(self.num_var, self._powers[i])]
+        return self
 
     def get_monomials(self):
         return self._monomials
@@ -156,7 +179,7 @@ class Polynomial:
             powers_result,
             total = self.num_var ** num_vertices,
             position=0):
-            self.add_monomial(coef, Monomial(len(p), p))
+            self.add_monomial(coef, Monomial(self.num_var, p))
         
         return self
 
@@ -174,7 +197,7 @@ class Polynomial:
         return Polynomial(self.num_var, self._coef, self._powers)
 
     def __add__(self, other):
-        return self.copy().add_monomials(other.get_coef(), other.get_powers())
+        return self.__copy__().add_monomials(other.get_coefs(), other.get_powers())
     
     def __radd__(self, other):
         if other == 0:
@@ -183,9 +206,44 @@ class Polynomial:
             return self.__add__(other)
 
     def __sub__(self, other):
-        return self.copy().add_monomials(
-            np.array(other.get_coef()) * -1,
+        return self.__copy__().add_monomials(
+            np.array(other.get_coefs()) * -1,
             other.get_powers())
+
+    def __mul__(self, other):
+        if isinstance(other, int) or isinstance(other, float):
+            new = self.__copy__().scale_coefs(other)
+            return new
+        elif isinstance(other, Monomial):
+            return self.__helpmul(Polynomial(other.num_var).add_monomial(1, other))
+        
+        elif isinstance(other, Polynomial):
+            return self.__helpmul(other)
+        else:
+            return None
+
+    __rmul__ = __mul__ # commutative operation
+
+    def __helpmul(self, other_poly):
+        # iterates through monomials and makes new monomials
+        # assuming that num_var is the same
+        assert self.num_var == other_poly.num_var, 'Undefined op for different num_vars.'
+        new = Polynomial(self.num_var)
+        for ind in range(len(self._coef)):
+            for ind2 in range(len(other_poly.get_coefs())):
+                new.add_monomial(
+                    self.get_coef(ind) * other_poly.get_coef(ind2),
+                    self.get_monomial(ind) * other_poly.get_monomial(ind2)
+                )
+        return new
+
+    
+    def __pow__(self, other):
+        assert isinstance(other, int), 'undefined for floats'
+        new = self.__copy__()
+        for i in range(1, other):
+            new = new * self
+        return new
 
     
     # Equality and inequality
